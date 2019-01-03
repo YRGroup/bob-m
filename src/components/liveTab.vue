@@ -2,26 +2,55 @@
   <div class="liveTabContainer">
     <div>
       <tab>
-        <tab-item  v-model="tabIndex" :selected="tabIndex == 0 ? true :false" @on-item-click="onItemClick">互动</tab-item>
-        <tab-item  v-model="tabIndex" :selected="tabIndex == 1 ? true :false" @on-item-click="onItemClick">精彩瞬间</tab-item>
-        <tab-item v-if="livePlayer.isVote" v-model="tabIndex" :selected="tabIndex == 2 ? true :false" @on-item-click="onItemClick">节目投票</tab-item>
+        <tab-item
+          v-model="tabIndex"
+          :selected="tabIndex == 0 ? true :false"
+          @on-item-click="onItemClick"
+        >互动</tab-item>
+        <tab-item
+          v-model="tabIndex"
+          :selected="tabIndex == 1 ? true :false"
+          @on-item-click="onItemClick"
+        >精彩瞬间</tab-item>
+        <tab-item
+          v-if="livePlayer.isVote"
+          v-model="tabIndex"
+          :selected="tabIndex == 2 ? true :false"
+          @on-item-click="onItemClick"
+        >节目投票</tab-item>
       </tab>
     </div>
-    <div>  
-      <swiper v-model="tabIndex" class="swiper" height="100%"  :show-dots="false" :threshold="200" :min-moving-distance="20">
-
+    <div>
+      <swiper
+        v-model="tabIndex"
+        class="swiper"
+        height="100%"
+        :show-dots="false"
+        :threshold="200"
+        :min-moving-distance="20"
+      >
         <swiper-item class="swiperComment">
           <!-- <i class="iconfont refresh" @click="$router.push('/')">&#xe666;</i> -->
           <scroll-view class="content" ref="scroll">
-          <div class="tab-swiper vux-center  commentsBox">
-              <div v-for="(item,index) in showCommentList" :key="index" class="commentItem clearfix">
+            <div class="tab-swiper vux-center commentsBox">
+              <div
+                v-for="(item,index) in showCommentList"
+                :key="index"
+                class="commentItem clearfix"
+              >
                 <div class="commentUser">
-                  <img class="headImg" :src="item.headimgurl" alt="">
+                  <img class="headImg" :src="item.headimgurl" alt>
                 </div>
-                <div class="commentInfo">    
-                  <span v-text="item.nickname"></span>          
+                <div class="commentInfo">
+                  <span v-text="item.nickname"></span>
                   <span class="time" v-text="formatTime(item.addtime)"></span>
-                  <span class="deleteBtn"><i class="iconfont" v-if="item.openid==admin" @click="delComment(item.ID)">&#xe630;</i></span>
+                  <span class="deleteBtn">
+                    <i
+                      class="iconfont"
+                      v-if="item.openid==admin"
+                      @click="delComment(item.ID)"
+                    >&#xe630;</i>
+                  </span>
                   <p class="commentContent" v-text="item.content"></p>
                 </div>
               </div>
@@ -31,55 +60,62 @@
 
         <swiper-item style="background-color:#fff;">
           <scroll-view class="content noBottom" ref="introScroll">
-            <div class="tab-swiper vux-center liveInfo" v-html="livePlayer.introduction"> </div>
+            <div class="tab-swiper vux-center liveInfo" v-html="livePlayer.introduction"></div>
           </scroll-view>
         </swiper-item>
-        
+
         <swiper-item>
-          <scroll-view class="content votelist" >
-            <x-table v-if="livePlayer.programList"  :cell-bordered="false"  style="background-color:#fff;">
+          <scroll-view class="content votelist">
+            <x-table
+              v-if="livePlayer.programList"
+              :cell-bordered="false"
+              style="background-color:#fff;"
+            >
               <thead>
-                <tr>
+                <tr class="thead">
                   <th>节目名称</th>
                   <th>表演者</th>
                   <th>投票</th>
                 </tr>
               </thead>
               <tbody class="votetable">
-              <tr v-for="(i,index) in livePlayer.programList" :key="index">
-                <!-- <td>{{index+1}}</td> -->
-                <td>{{i.ProgramName}}</td>
-                <td>{{i.Actor}}</td>
-                <td>
-                  <x-button type="primary" mini :disabled="isVoted(i.ID)" @click.native="programvote(i.ID,i.ProgramName)">
-                    {{isVoted(i.ID)?'已投票':'投票'}}{{i.VoteCount}}
-                  </x-button>
-                </td>
-              </tr>
-            </tbody>
+                <tr v-for="(i,index) in livePlayer.programList" :key="index">
+                  <!-- <td>{{index+1}}</td> -->
+                  <td>{{i.ProgramName}}</td>
+                  <td>{{i.Actor}}</td>
+                  <td>
+                    <x-button
+                      type="primary"
+                      mini
+                      :disabled="isVoted(i.ID)"
+                      @click.native="programvote(i.ID,i.ProgramName)"
+                    >{{isVoted(i.ID)?'':''}}{{i.VoteCount}}</x-button>
+                  </td>
+                </tr>
+              </tbody>
             </x-table>
+            <bob-add></bob-add>
           </scroll-view>
         </swiper-item>
-        
       </swiper>
     </div>
     <div class="sendComment" v-show="showSendComment">
       <group class="weui-cells_form" style="box-shadow:0 -1px 3px #ccc">
-        <x-input title="" :show-clear="false"  v-model="content" placeholder="说点什么">
+        <x-input title :show-clear="false" v-model="content" placeholder="说点什么">
           <x-button slot="right" type="primary" @click.native="sendComment" mini>发送</x-button>
         </x-input>
       </group>
     </div>
-    <x-dialog v-model="showCodeImg" >
+    <x-dialog v-model="showCodeImg">
       <div class="code-dialog">
         <div class="img-box">
-          <img :src="logo" style="max-width:100%">
+          <img :src="livePlayer.QRCode" style="max-width:100%">
         </div>
         <p class="title">长按关注公众号</p>
         <i class="iconfont close" @click="showCodeImg = false">&#xe641;</i>
       </div>
     </x-dialog>
-    <i class="iconfont showCode"  v-show="showSendComment"  @click="showCodeImg = true">&#xe615;</i>
+    <i class="iconfont showCode" v-show="showSendComment" @click="showCodeImg = true">&#xe615;</i>
   </div>
 </template>
 <script>
@@ -98,6 +134,7 @@ import {
   XTable
 } from "vux";
 import scrollView from "@/components/scroll-view";
+import bobAdd from "@/components/bobAdd";
 import { getCookie } from "@/assets/js/util";
 
 const MAXLENGTH = 100;
@@ -108,13 +145,12 @@ export default {
       tabIndex: 0,
       content: "",
       showWX: true,
-      QRcodeIMG: "",
       admin: "",
       curid: -1,
       timer: 0,
       hasVoteList: [],
       showCodeImg: false,
-      logo: require("@/assets/img/yepCode.jpg"),
+      logo: require("@/assets/img/yepCode.jpg")
     };
   },
   props: {
@@ -123,6 +159,10 @@ export default {
       default: () => {
         return {};
       }
+    },
+    QRCode: {
+      type: String,
+      default: ""
     }
   },
   components: {
@@ -138,7 +178,8 @@ export default {
     XDialog,
     XImg,
     scrollView,
-    XTable
+    XTable,
+    bobAdd
   },
   computed: {
     showSendComment() {
@@ -298,7 +339,7 @@ export default {
   position: absolute;
   right: 30px;
   bottom: 30%;
-  font-size:20px;
+  font-size: 20px;
   color: @main;
   width: 30px;
   height: 30px;
@@ -459,8 +500,24 @@ export default {
 .deleteBtn {
   float: right;
 }
-.votetable tr td {
-  padding: 8px 0;
+.votetable td {
+  padding: 15px 2px;
+  word-break: break-all;
+  // box-sizing: border-box;
+  line-height: 18px;
+  height: 36px;
+}
+.thead{
+  th {
+    &:nth-of-type(1) {
+      width: 100px;
+    }
+    &:nth-of-type(2) {
+    }
+    &:nth-of-type(3) {
+      width: 80px;
+    }
+  }
 }
 .votetable tr:nth-child(2n + 1) {
   background: #f6f6f6;

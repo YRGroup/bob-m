@@ -14,7 +14,9 @@
         <i class="iconfont play" v-show="isWeiXin" @click="playLive">&#xe63c;</i>
       </div>
     </div>
-    <live-tab id="comments" v-show="showComments" :livePlayer="livePlayer"></live-tab>
+    <live-tab id="comments" v-show="showComments" 
+    :livePlayer="livePlayer"
+    ></live-tab>
   </div>
 </template>
 
@@ -181,7 +183,8 @@ export default {
           title: res.Content.Title,
           wxShareContent: res.Content.WXShareContent,
           wxSharePic: res.Content.WXSharePic,
-          coverImg: res.Content.CoverImg
+          coverImg: res.Content.CoverImg,
+          QRCode: res.Content.QRCode,
         };
         this.livePlayer = new LivePlayer(liveInfoData);
         this.liveInfoReady();
@@ -198,7 +201,7 @@ export default {
     this.liveId = this.$route.params.liveId;
   },
   mounted() {
-    this.isWeiXin = setTimeout(() => {
+    this.timer = setTimeout(() => {
       this.getOneLiveRoom();
     }, 1000);
   },

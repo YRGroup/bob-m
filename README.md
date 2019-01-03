@@ -1,18 +1,4 @@
-# Project-Y
-
-
-
-## github集合
-- [pc端](https://github.com/YRGroup/y-pc)
-- [移动端](https://github.com/YRGroup/y)
-- [管理后台](https://github.com/YRGroup/y-admin)
-
-
-## demo
-- [pc端](http://testwebsite.zzflgs.cn/web)
-- [移动端](http://testwebsite.zzflgs.cn/m)
-- [管理后台](http://testwebsite.zzflgs.cn/admin)
-
+# bob活动页面项目集合
 
 ## Build Setup
 
