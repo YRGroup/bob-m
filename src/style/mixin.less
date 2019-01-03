@@ -1,0 +1,63 @@
+@import "./theme.less";
+
+.flex() {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: distribute;
+  justify-content: space-around;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  -webkit-box-align: center;
+  -moz-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.flex-column() {
+  .flex();
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -moz-box-orient: vertical;
+  -moz-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.middle() {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+
+.background-cover {
+  background-repeat: no-repeat;
+  background-position: center center;
+  -moz-background-size: cover;
+  background-size: cover;
+}
+
+.bg_modal {
+  &::after {
+    content: '';
+    background: rgba(0, 0, 0, .75);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    // z-index: 2;
+  }
+}
+
+.inline {
+  display: inline;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
