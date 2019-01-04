@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <div class="video">
+    <div :class="['video',fullScreen?'fullVideo':'']">
       <div v-show="!showError" class="prism-player" id="J_prismPlayer"></div>
       <div class="modal" v-show="showError">
         <p>{{playerErrMsg}}</p>
@@ -11,12 +11,10 @@
         :style="{backgroundImage:`url(${livePlayer.coverImg})`}"
         v-show="showCover"
       >
-        <i class="iconfont play" v-show="isWeiXin" @click="playLive">&#xe63c;</i>
+        <i class="iconfont play" @click="playLive">&#xe63c;</i>
       </div>
     </div>
-    <live-tab id="comments" v-show="showComments" 
-    :livePlayer="livePlayer"
-    ></live-tab>
+    <live-tab id="comments" v-show="!fullScreen" :livePlayer="livePlayer"></live-tab>
   </div>
 </template>
 
@@ -67,7 +65,9 @@ export default {
       showError: false,
       playerErrMsg: "",
       livePlayer: {},
-      showCodeImg: true
+      showCodeImg: true,
+      vheight: "40vh",
+      fullScreen: false
     };
   },
   components: {
@@ -82,7 +82,7 @@ export default {
       window.location.reload();
     },
     initWX() {
-      let link = "http://" + window.location.host + "/m/#/live/" + this.liveId;
+      const link = window.location.href;
       console.log(link);
       this.$API.getWxData().then(res => {
         console.log(res, link);
@@ -130,12 +130,20 @@ export default {
         height: "100%",
         useH5Prism: true,
         source: this.livePlayer.playerUrl,
+        source:
+          "http://live.bobmedia.cn/6/2.m3u8?auth_key=1546651464-0-0-05a2a6cbbbb9026859897c3eaeb8ff05",
         cover: this.livePlayer.coverImg,
-        x5_video_position: "top",
+        x5_video_position: "normal",
         x5_type: "h5", //声明启用同层H5播放器，支持的值：h5
         showBarTime: "2000",
         controlBarVisibility: "hover",
-        preload: true
+        preload: false,
+        x5_orientation: "portrait"
+      });
+      console.log(this.player);
+      this.player.on("ready", ev => {
+        // this.player.play();
+        console.log("player ready");
       });
       this.player.on("onM3u8Retry", ev => {
         this.showErrorMsg("直播还没开始...");
@@ -144,18 +152,33 @@ export default {
         console.log("开始播放");
         this.showCover = false;
       });
-      // this.player.on("ready", ev => {
-      //   console.log("ready");
-      //   this.showCover = false;
-      // });
+      this.player.on("ready", ev => {
+        console.log("ready");
+        this.showCover = false;
+      });
       this.player.on("liveStreamStop", ev => {
         this.showErrorMsg("直播还没开始...");
       });
       this.player.on("requestFullScreen", ev => {
         console.log("全屏");
+        // this.$vux.toast.text("横屏全屏", "top");
+        this.fullScreen = true;
       });
       this.player.on("cancelFullScreen", ev => {
         console.log("取消全屏");
+        // this.$vux.toast.text("横屏全屏取消", "top");
+        this.fullScreen = false;
+      });
+      this.player.on("x5requestFullScreen", ev => {
+        console.log("全屏");
+        // this.$vux.toast.text("x5全屏", "top");
+      });
+      this.player.on("x5cancelFullScreen", ev => {
+        console.log("x5取消全屏");
+        // this.$vux.toast.text("x5取消全屏", "top");
+        this.fullScreen = false;
+        //同时取消全屏
+        this.player.fullscreenService.cancelFullScreen();
       });
     },
     playLive() {
@@ -184,7 +207,7 @@ export default {
           wxShareContent: res.Content.WXShareContent,
           wxSharePic: res.Content.WXSharePic,
           coverImg: res.Content.CoverImg,
-          QRCode: res.Content.QRCode,
+          QRCode: res.Content.QRCode
         };
         this.livePlayer = new LivePlayer(liveInfoData);
         this.liveInfoReady();
@@ -201,14 +224,12 @@ export default {
     this.liveId = this.$route.params.liveId;
   },
   mounted() {
-    this.timer = setTimeout(() => {
-      this.getOneLiveRoom();
-    }, 1000);
-  },
-  beforeRouteLeave(to, from, next) {
-    clearInterval(this.timer);
-    next();
+    this.getOneLiveRoom();
   }
+  // beforeRouteLeave(to, from, next) {
+  //   clearInterval(this.timer);
+  //   next();
+  // }
 };
 </script>
 
@@ -231,6 +252,14 @@ export default {
 .video {
   height: 40vh;
   position: relative;
+  &.fullVideo {
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+  }
   .modal {
     position: absolute;
     padding: 60px 0;
